@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Users — VitaStore Admin</title>
+    <link rel="stylesheet" th:href="@{/admin/css/style.css?v=1}" />
+  </head>
+  <body>
+    <div class="admin-layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <div class="logo-icon">🌿</div>
+          <div>
+            <div class="logo-text">VitaStore</div>
+            <div class="logo-sub">Admin Panel</div>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section-label">Tổng quan</div>
+          <a class="nav-item" th:href="@{/admin}"
+            ><span class="nav-icon">🏠</span> Dashboard</a
+          >
+          <div class="nav-section-label">Quản lý đơn hàng</div>
+          <a class="nav-item" th:href="@{/admin/order/list}"
+            ><span class="nav-icon">📦</span> Orders</a
+          >
+          <div class="nav-section-label">Sản phẩm</div>
+          <a class="nav-item" th:href="@{/admin/product/list}"
+            ><span class="nav-icon">🛍</span> Products</a
+          >
+          <a class="nav-item" th:href="@{/admin/product/category}"
+            ><span class="nav-icon">🗂</span> Categories</a
+          >
+          <div class="nav-section-label">Người dùng</div>
+          <a class="nav-item active" th:href="@{/admin/user/list}"
+            ><span class="nav-icon">👥</span> Users</a
+          >
+          <div class="nav-section-label">Marketing</div>
+          <a class="nav-item" th:href="@{/admin/marketing/discount}"
+            ><span class="nav-icon">🏷</span> Discounts</a
+          >
+          <div class="nav-section-label">Reviews</div>
+          <a class="nav-item" th:href="@{/admin/reviews/review}"
+            ><span class="nav-icon">⭐</span> Reviews</a
+          >
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="admin-profile">
+            <div class="admin-avatar">A</div>
+            <div>
+              <div class="admin-name">Admin Master</div>
+              <div class="admin-role">Super Admin</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="main-wrap">
+        <header class="topbar">
+          <div class="topbar-info">
+            <div class="topbar-title">Users</div>
+            <div class="topbar-breadcrumb">Quản lý tài khoản</div>
+          </div>
+          <div class="topbar-right">
+            <button
+              class="icon-btn"
+              title="Cài đặt"
+              onclick="toggleLogoutDropdown()"
+            >
+              ⚙️
+            </button>
+            <div
+              class="dropdown-menu"
+              id="logoutDropdown"
+              style="display: none"
+            >
+              <button
+                class="dropdown-item dropdown-item-logout"
+                onclick="logout()"
+              >
+                ❌ Đăng xuất
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <div class="page-wrap">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Quản lý Users</div>
+              <div class="page-subtitle">
+                Tất cả tài khoản người dùng và quản trị viên
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="openAdd()">
+              + Thêm người dùng
+            </button>
+          </div>
+
+          <!-- SUMMARY CARDS -->
+          <div class="stats-grid" style="margin-bottom: 20px">
+            <div class="stat-card">
+              <div class="stat-icon blue">👥</div>
+              <div>
+                <div class="stat-val" id="countAll">—</div>
+                <div class="stat-label">Tổng tài khoản</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon cyan">👤</div>
+              <div>
+                <div class="stat-val" id="countUsers">—</div>
+                <div class="stat-label">Người dùng</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon orange">👑</div>
+              <div>
+                <div class="stat-val" id="countAdmins">—</div>
+                <div class="stat-label">Quản trị viên</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon green">✓</div>
+              <div>
+                <div class="stat-val" id="countActive">—</div>
+                <div class="stat-label">Đang hoạt động</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="toolbar">
+                <div class="search-box">
+                  <span class="search-icon">🔍</span>
+                  <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Tìm tên, email, số điện thoại..."
+                    oninput="filterUsers()"
+                  />
+                </div>
+                <select
+                  class="select-filter"
+                  id="roleFilter"
+                  onchange="filterUsers()"
+                >
+                  <option value="">Tất cả vai trò</option>
+                  <option value="ADMIN">Admin</option>
+                  <option value="CUSTOMER">User</option>
+                </select>
+                <select
+                  class="select-filter"
+                  id="statusFilter"
+                  onchange="filterUsers()"
+                >
+                  <option value="">Tất cả trạng thái</option>
+                  <option value="ACTIVE">Active</option>
+                  <option value="INACTIVE">Inactive</option>
+                </select>
+              </div>
+              <span class="badge badge-info" id="userCount">—</span>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="usersBody">
+                  <tr>
+                    <td
+                      colspan="7"
+                      style="
+                        text-align: center;
+                        padding: 40px;
+                        color: var(--text-muted);
+                      "
+                    >
+                      Đang tải...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="pagination">
+              <button class="page-btn">‹</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">›</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── USER MODAL ── -->
+    <div class="modal-overlay" id="userModalOverlay">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title" id="userModalTitle">Thêm người dùng</div>
+          <button
+            class="btn btn-ghost btn-icon"
+            onclick="Modal.close('userModalOverlay')"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="uId" />
+          <div class="form-group">
+            <label class="form-label">Họ và tên *</label>
+            <input class="form-control" id="uName" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email *</label>
+            <input class="form-control" id="uEmail" type="email" required />
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Số điện thoại</label>
+              <input class="form-control" id="uPhone" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Vai trò</label>
+              <select class="form-control" id="uRole">
+                <option value="CUSTOMER">👤 User</option>
+                <option value="ADMIN">👑 Admin</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Trạng thái</label>
+            <select class="form-control" id="uStatus">
+              <option value="ACTIVE">● Active</option>
+              <option value="INACTIVE">● Inactive</option>
+            </select>
+          </div>
+          <div class="form-group" id="passwordField">
+            <label class="form-label">Mật khẩu</label>
+            <input class="form-control" id="uPassword" type="password" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            class="btn btn-outline"
+            onclick="Modal.close('userModalOverlay')"
+          >
+            Hủy
+          </button>
+          <button class="btn btn-primary" id="uSaveBtn" onclick="saveUser()">
+            💾 Lưu
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DELETE CONFIRM -->
+    <div class="modal-overlay" id="deleteModalOverlay">
+      <div class="modal modal-sm">
+        <div
+          class="modal-body"
+          style="padding: 32px 28px 20px; text-align: center"
+        >
+          <div class="confirm-icon">🗑️</div>
+          <div class="confirm-title">Xác nhận xóa tài khoản</div>
+          <div class="confirm-text">
+            Bạn đang xóa tài khoản<br /><strong id="deleteTargetLabel"></strong>
+          </div>
+          <div class="countdown-bar">
+            <div class="countdown-fill" id="countdownFill"></div>
+          </div>
+          <div class="countdown-label" id="countdownLabel">
+            Vui lòng chờ 10 giây...
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="DeleteConfirm.hide()">
+            Hủy
+          </button>
+          <button
+            class="btn btn-danger"
+            id="confirmDeleteBtn"
+            onclick="DeleteConfirm.confirm()"
+            disabled
+          >
+            Xác nhận xóa
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script th:src="@{/admin/js/admin.js}"></script>
+    <script>
+      let allUsers = [];
+      let editUserId = null;
+
+      async function loadUsers() {
+        allUsers = await API.getUsers();
+
+        document.getElementById("countAll").textContent = allUsers.length;
+        document.getElementById("countUsers").textContent = allUsers.filter(
+          (u) => u.role === "CUSTOMER",
+        ).length;
+        document.getElementById("countAdmins").textContent = allUsers.filter(
+          (u) => u.role === "ADMIN",
+        ).length;
+        document.getElementById("countActive").textContent = allUsers.filter(
+          (u) => u.status === "ACTIVE",
+        ).length;
+
+        filterUsers();
+      }
+
+      function renderUsers(list) {
+        document.getElementById("userCount").textContent =
+          `${list.length} tài khoản`;
+        document.getElementById("usersBody").innerHTML = list.length
+          ? list
+              .map(
+                (u) => `
+        <tr>
+          <td class="td-mono">${u.id}</td>
+          <td><strong>${u.fullName}</strong></td>
+          <td style="color:var(--text-secondary)">${u.email}</td>
+          <td class="td-mono">${u.phone || "—"}</td>
+          <td>${Utils.roleBadge(u.role)}</td>
+          <td>${Utils.userStatusBadge(u.status)}</td>
+          <td>
+            <div class="action-group">
+              <button class="btn btn-sm btn-outline" onclick='openEdit(${JSON.stringify(u)})'>✏️ Edit</button>
+              <button class="btn btn-sm btn-danger" onclick="confirmDelete(${u.id},'${u.fullName}')">🗑</button>
+            </div>
+          </td>
+        </tr>`,
+              )
+              .join("")
+          : `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted)">Không tìm thấy</td></tr>`;
+      }
+
+      function filterUsers() {
+        const q = document.getElementById("searchInput").value.toLowerCase();
+        const r = document.getElementById("roleFilter").value;
+        const st = document.getElementById("statusFilter").value;
+        renderUsers(
+          allUsers.filter(
+            (u) =>
+              (!q ||
+                u.fullName.toLowerCase().includes(q) ||
+                u.email.toLowerCase().includes(q) ||
+                (u.phone || "").toLowerCase().includes(q)) &&
+              (!r || u.role === r) &&
+              (!st || u.status === st),
+          ),
+        );
+      }
+
+      function openAdd() {
+        editUserId = null;
+        document.getElementById("userModalTitle").textContent =
+          "Thêm người dùng mới";
+        ["uId", "uName", "uEmail", "uPhone", "uPassword"].forEach(
+          (id) => (document.getElementById(id).value = ""),
+        );
+        document.getElementById("uRole").value = "CUSTOMER";
+        document.getElementById("uStatus").value = "ACTIVE";
+        Modal.open("userModalOverlay");
+      }
+
+      function openEdit(u) {
+        editUserId = u.id;
+        document.getElementById("userModalTitle").textContent =
+          "Chỉnh sửa người dùng";
+        document.getElementById("uId").value = u.id;
+        document.getElementById("uName").value = u.fullName;
+        document.getElementById("uEmail").value = u.email;
+        document.getElementById("uPhone").value = u.phone || "";
+        document.getElementById("uRole").value = u.role;
+        document.getElementById("uStatus").value = u.status;
+        document.getElementById("uPassword").value = "";
+        Modal.open("userModalOverlay");
+      }
+
+      async function saveUser() {
+        const name = document.getElementById("uName").value.trim();
+        const email = document.getElementById("uEmail").value.trim();
+        const password = document.getElementById("uPassword").value.trim();
+        if (!name || !email) {
+          Utils.toast("Vui lòng điền tên và email!", "error");
+          return;
+        }
+
+        if (!editUserId && !password) {
+          Utils.toast("Vui lòng nhập mật khẩu khi tạo user mới!", "error");
+          return;
+        }
+
+        const btn = document.getElementById("uSaveBtn");
+        btn.disabled = true;
+        btn.textContent = "⏳...";
+
+        const data = {
+          fullName: name,
+          email,
+          phone: document.getElementById("uPhone").value.trim(),
+          role: document.getElementById("uRole").value,
+          status: document.getElementById("uStatus").value,
+          passwordHash: password,
+        };
+
+        try {
+          if (editUserId) {
+            await API.updateUser(editUserId, data);
+            Utils.toast("Đã cập nhật tài khoản!");
+          } else {
+            await API.createUser(data);
+            Utils.toast("Đã thêm người dùng mới!");
+          }
+
+          await loadUsers();
+          Modal.close("userModalOverlay");
+        } catch (error) {
+          Utils.toast(error.message || "Có lỗi khi lưu người dùng", "error");
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = "💾 Lưu";
+        }
+      }
+
+      function confirmDelete(id, name) {
+        DeleteConfirm.show(`"${name}"`, async () => {
+          try {
+            await API.deleteUser(id);
+            await loadUsers();
+            Utils.toast(`Đã xóa tài khoản "${name}"`);
+          } catch (error) {
+            Utils.toast(error.message || "Có lỗi khi xóa người dùng", "error");
+          }
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", loadUsers);
+    </script>
+  </body>
+</html>

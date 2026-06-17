@@ -1,0 +1,28 @@
+# ========================================
+# ROOT GITIGNORE
+# ========================================
+
+# Byte-compiled / cached Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+
+# Exclude large/unrelated folders
+dataset_clean_online/
+python-3.10.11-amd64.exe
+*.zip
+*.tar.gz
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.suo

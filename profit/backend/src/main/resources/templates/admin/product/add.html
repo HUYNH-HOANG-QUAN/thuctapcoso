@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Add / Edit Product — VitaStore Admin</title>
+    <link rel="stylesheet" th:href="@{/admin/css/style.css?v=1}" />
+  </head>
+  <body>
+    <div class="admin-layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <div class="logo-icon">🌿</div>
+          <div>
+            <div class="logo-text">VitaStore</div>
+            <div class="logo-sub">Admin Panel</div>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section-label">Tổng quan</div>
+          <a class="nav-item" th:href="@{/admin}"
+            ><span class="nav-icon">🏠</span> Dashboard</a
+          >
+          <div class="nav-section-label">Quản lý đơn hàng</div>
+          <a class="nav-item" th:href="@{/admin/order/list}"
+            ><span class="nav-icon">📦</span> Orders</a
+          >
+          <div class="nav-section-label">Sản phẩm</div>
+          <a class="nav-item active" th:href="@{/admin/product/list}"
+            ><span class="nav-icon">🛍</span> Products</a
+          >
+          <a class="nav-item" th:href="@{/admin/product/category}"
+            ><span class="nav-icon">🗂</span> Categories</a
+          >
+          <div class="nav-section-label">Người dùng</div>
+          <a class="nav-item" th:href="@{/admin/user/list}"
+            ><span class="nav-icon">👥</span> Users</a
+          >
+          <div class="nav-section-label">Marketing</div>
+          <a class="nav-item" th:href="@{/admin/marketing/discount}"
+            ><span class="nav-icon">🏷</span> Discounts</a
+          >
+          <div class="nav-section-label">Reviews</div>
+          <a class="nav-item" th:href="@{/admin/reviews/review}"
+            ><span class="nav-icon">⭐</span> Reviews</a
+          >
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="admin-profile">
+            <div class="admin-avatar">A</div>
+            <div>
+              <div class="admin-name">Admin Master</div>
+              <div class="admin-role">Super Admin</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="main-wrap">
+        <header class="topbar">
+          <div class="topbar-info">
+            <div class="topbar-title" id="topbarTitle">Add Product</div>
+            <div class="topbar-breadcrumb" id="topbarBreadcrumb">
+              Products → Thêm mới
+            </div>
+          </div>
+          <div class="topbar-right">
+            <button
+              class="icon-btn"
+              title="Cài đặt"
+              onclick="toggleLogoutDropdown()"
+            >
+              ⚙️
+            </button>
+            <div
+              class="dropdown-menu"
+              id="logoutDropdown"
+              style="display: none"
+            >
+              <button
+                class="dropdown-item dropdown-item-logout"
+                onclick="logout()"
+              >
+                ❌ Đăng xuất
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <div class="page-wrap">
+          <a th:href="@{/admin/product/list}" class="back-btn"
+            >← Quay lại danh sách Products</a
+          >
+
+          <div class="page-header">
+            <div>
+              <div class="page-title" id="pageTitle">Thêm sản phẩm mới</div>
+              <div class="page-subtitle">
+                Điền thông tin sản phẩm thực phẩm chức năng
+              </div>
+            </div>
+            <span class="badge badge-info" id="modeTag">Chế độ: Thêm mới</span>
+          </div>
+
+          <div class="grid-2" style="align-items: start">
+            <!-- MAIN FORM -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">📝 Thông tin cơ bản</div>
+              </div>
+              <div style="padding: 24px">
+                <input type="hidden" id="productId" />
+
+                <div class="form-group">
+                  <label class="form-label">Tên sản phẩm *</label>
+                  <input class="form-control" id="fName" required />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Category ID *</label>
+                  <select class="form-control" id="fCategory">
+                    <option value="">— Chọn danh mục —</option>
+                  </select>
+                  <div class="form-hint">
+                    Chọn danh mục phù hợp với sản phẩm
+                  </div>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Giá bán (VNĐ) *</label>
+                    <input
+                      class="form-control"
+                      id="fPrice"
+                      type="number"
+                      min="0"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Tồn kho *</label>
+                    <input
+                      class="form-control"
+                      id="fStock"
+                      type="number"
+                      min="0"
+                    />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Mô tả ngắn</label>
+                  <textarea
+                    class="form-control"
+                    id="fDesc"
+                    placeholder="Mô tả sản phẩm, thành phần, công dụng..."
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- EXTRA INFO -->
+            <div>
+              <!-- Edit mode: show current stats -->
+              <div
+                class="card"
+                id="editStatsCard"
+                style="display: none; margin-bottom: 20px"
+              >
+                <div class="card-header">
+                  <div class="card-title">📊 Thông tin hiện tại</div>
+                </div>
+                <div style="padding: 18px">
+                  <div class="detail-grid">
+                    <div class="detail-field">
+                      <div class="detail-field-label">Rating Avg</div>
+                      <div class="detail-field-value" id="showRating">—</div>
+                    </div>
+                    <div class="detail-field">
+                      <div class="detail-field-label">Rating Count</div>
+                      <div class="detail-field-value" id="showRatingCount">
+                        —
+                      </div>
+                    </div>
+                    <div class="detail-field">
+                      <div class="detail-field-label">Product ID</div>
+                      <div class="detail-field-value" id="showId">—</div>
+                    </div>
+                    <div class="detail-field">
+                      <div class="detail-field-label">Category ID</div>
+                      <div class="detail-field-value" id="showCatId">—</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ACTIONS -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">⚡ Thao tác</div>
+                </div>
+                <div
+                  style="
+                    padding: 20px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                  "
+                >
+                  <button class="btn btn-primary btn-lg" onclick="submitForm()">
+                    <span id="submitIcon">💾</span>
+                    <span id="submitLabel">Lưu sản phẩm</span>
+                  </button>
+                  <a
+                    th:href="@{/admin/product/list}"
+                    class="btn btn-outline btn-lg"
+                    >✕ Hủy bỏ</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script th:src="@{/admin/js/admin.js}"></script>
+    <script>
+      let editMode = false;
+      let editId = null;
+
+      async function initPage() {
+        // Load categories
+        const cats = await API.getCategories();
+        const sel = document.getElementById("fCategory");
+        cats.forEach((c) => {
+          const opt = document.createElement("option");
+          opt.value = c.id;
+          opt.textContent = `${c.id} — ${c.name}`;
+          sel.appendChild(opt);
+        });
+
+        // Check if edit mode (?edit=ID)
+        const params = new URLSearchParams(location.search);
+        const id = params.get("edit");
+        if (id) {
+          editMode = true;
+          editId = parseInt(id);
+          document.getElementById("topbarTitle").textContent = "Edit Product";
+          document.getElementById("topbarBreadcrumb").textContent =
+            "Products → Chỉnh sửa";
+          document.getElementById("pageTitle").textContent =
+            "Chỉnh sửa sản phẩm";
+          document.getElementById("modeTag").textContent = "Chế độ: Chỉnh sửa";
+          document.getElementById("modeTag").className = "badge badge-warning";
+          document.getElementById("submitIcon").textContent = "✏️";
+          document.getElementById("submitLabel").textContent =
+            "Cập nhật sản phẩm";
+          document.getElementById("editStatsCard").style.display = "block";
+
+          const p = await API.getProductById(editId);
+          if (p) {
+            document.getElementById("productId").value = p.id;
+            document.getElementById("fName").value = p.name;
+            document.getElementById("fCategory").value = p.category_id;
+            document.getElementById("fPrice").value = p.price;
+            document.getElementById("fStock").value = p.stock_quantity;
+            document.getElementById("showRating").innerHTML = Utils.stars(
+              p.rating_avg,
+            );
+            document.getElementById("showRatingCount").textContent =
+              p.rating_count;
+            document.getElementById("showId").textContent = p.id;
+            document.getElementById("showCatId").textContent = p.category_id;
+          }
+        }
+      }
+
+      async function submitForm() {
+        const btn = document.getElementById("submitLabel");
+        btn.textContent = "⏳ Đang lưu...";
+
+        const data = {
+          name: document.getElementById("fName").value.trim(),
+          category_id: +document.getElementById("fCategory").value,
+          price: +document.getElementById("fPrice").value,
+          stock_quantity: +document.getElementById("fStock").value,
+        };
+
+        if (!data.name || !data.category_id || !data.price) {
+          Utils.toast("Vui lòng điền đầy đủ thông tin bắt buộc!", "error");
+          btn.textContent = editMode ? "Cập nhật sản phẩm" : "Lưu sản phẩm";
+          return;
+        }
+
+        if (editMode) {
+          await API.updateProduct(editId, data);
+          Utils.toast("Đã cập nhật sản phẩm thành công!");
+        } else {
+          await API.createProduct(data);
+          Utils.toast("Đã thêm sản phẩm mới!");
+          document.getElementById("fName").value = "";
+          document.getElementById("fPrice").value = "";
+          document.getElementById("fStock").value = "";
+        }
+        btn.textContent = editMode ? "Cập nhật sản phẩm" : "Lưu sản phẩm";
+      }
+
+      document.addEventListener("DOMContentLoaded", initPage);
+    </script>
+  </body>
+</html>

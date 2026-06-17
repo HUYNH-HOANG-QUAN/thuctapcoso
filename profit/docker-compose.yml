@@ -1,0 +1,75 @@
+name: profit
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: profit-backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/ProFitSuppsDB?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Ho_Chi_Minh&connectionCharacterSet=UTF-8
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-root}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-root}
+      FRONTEND_BASE_URL: ${FRONTEND_BASE_URL:-http://localhost:5173}
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:8080/ProFitSuppsDB
+        VITE_CHAT_API_URL: http://localhost:8000
+    container_name: profit-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+  pgvector:
+    image: pgvector/pgvector:pg16
+    container_name: pgvector-container
+    profiles: ["chatbot"]
+    environment:
+      POSTGRES_USER: langchain
+      POSTGRES_PASSWORD: langchain
+      POSTGRES_DB: langchain
+    ports:
+      - "6024:5432"
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U langchain -d langchain"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  chatbot:
+    build:
+      context: ./chatbot
+      dockerfile: Dockerfile
+    container_name: profit-chatbot
+    restart: unless-stopped
+    profiles: ["chatbot"]
+    depends_on:
+      pgvector:
+        condition: service_healthy
+    environment:
+      PGVECTOR_CONNECTION: ${PGVECTOR_CONNECTION}
+      PGVECTOR_COLLECTION: ${PGVECTOR_COLLECTION}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_CHAT_MODEL: ${OPENAI_CHAT_MODEL}
+      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL}
+      ALLOW_DEMO_RETRIEVER: ${ALLOW_DEMO_RETRIEVER}
+    env_file:
+      - ./chatbot/.env
+    ports:
+      - "8000:8000"
+
+volumes:
+  pgvector_data:

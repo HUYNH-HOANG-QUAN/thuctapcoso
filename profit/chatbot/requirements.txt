@@ -1,0 +1,11 @@
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+openai>=1.40.0
+python-dotenv>=1.0.0
+
+# RAG retriever (PGVector + OpenAIEmbeddings)
+langchain-core>=0.3.0
+langchain-openai>=0.2.0
+langchain-postgres>=0.0.13
+psycopg[binary]>=3.1.18
+sqlalchemy>=2.0.30

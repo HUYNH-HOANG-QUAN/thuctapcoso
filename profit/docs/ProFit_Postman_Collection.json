@@ -1,0 +1,186 @@
+{
+  "info": {
+    "name": "ProFit API Collection",
+    "description": "Bộ sưu tập API cho dự án ProFit (Bao gồm Public và Protected APIs)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login (Lấy Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set(\"token\", jsonData.token);",
+                  "    console.log(\"Token auto-saved to collection variables!\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"khachhang@gmail.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/signin",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "signin"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Public APIs (Dành cho TM3)",
+      "item": [
+        {
+          "name": "Lấy Danh Mục",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/public/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "public", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Lấy Sản Phẩm (Phân trang & Lọc)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/public/products?page=0&size=10&keyword=Whey",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "public", "products"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "keyword", "value": "Whey" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Chi Tiết Sản Phẩm",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/public/products/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "public", "products", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Protected APIs (Dành cho TM4)",
+      "item": [
+        {
+          "name": "Lấy Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Lịch Sử Đơn Hàng",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/my-orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "my-orders"]
+            }
+          }
+        },
+        {
+          "name": "Tạo Đơn Hàng (Checkout)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipientName\": \"Nguyễn Văn A\",\n  \"recipientPhone\": \"0987654321\",\n  \"shippingAddressLine1\": \"123 Cầu Giấy\",\n  \"shippingCity\": \"Hà Nội\",\n  \"shippingProvince\": \"Cầu Giấy\",\n  \"note\": \"Giao hàng trong giờ hành chính\",\n  \"items\": [\n    {\n      \"productId\": 1,\n      \"quantity\": 2\n    },\n    {\n      \"productId\": 2,\n      \"quantity\": 1\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/create",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "create"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/ProFitSuppsDB"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}

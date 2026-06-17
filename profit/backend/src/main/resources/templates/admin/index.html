@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>VitaStore Admin</title>
+    <link rel="stylesheet" th:href="@{/admin/css/style.css?v=1}" />
+  </head>
+  <body>
+    <div class="admin-layout">
+      <!-- ── SIDEBAR ── -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <div class="logo-icon">🌿</div>
+          <div>
+            <div class="logo-text">VitaStore</div>
+            <div class="logo-sub">Admin Panel</div>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section-label">Tổng quan</div>
+          <a class="nav-item active" data-page="dashboard" th:href="@{/admin}"
+            ><span class="nav-icon">🏠</span> Dashboard</a
+          >
+          <div class="nav-section-label">Quản lý đơn hàng</div>
+          <a class="nav-item" data-page="orders" th:href="@{/admin/order/list}"
+            ><span class="nav-icon">📦</span> Orders
+          </a>
+          <div class="nav-section-label">Sản phẩm</div>
+          <a
+            class="nav-item"
+            data-page="products"
+            th:href="@{/admin/product/list}"
+            ><span class="nav-icon">🛍</span> Products</a
+          >
+          <a
+            class="nav-item"
+            data-page="categories"
+            th:href="@{/admin/product/category}"
+            ><span class="nav-icon">🗂</span> Categories</a
+          >
+          <div class="nav-section-label">Người dùng</div>
+          <a class="nav-item" data-page="users" th:href="@{/admin/user/list}"
+            ><span class="nav-icon">👥</span> Users</a
+          >
+          <div class="nav-section-label">Marketing</div>
+          <a
+            class="nav-item"
+            data-page="discounts"
+            th:href="@{/admin/marketing/discount}"
+            ><span class="nav-icon">🏷</span> Discounts</a
+          >
+          <div class="nav-section-label">Reviews</div>
+          <a
+            class="nav-item"
+            data-page="reviews"
+            th:href="@{/admin/reviews/review}"
+            ><span class="nav-icon">⭐</span> Reviews</a
+          >
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="admin-profile">
+            <div class="admin-avatar">A</div>
+            <div>
+              <div class="admin-name">Admin Master</div>
+              <div class="admin-role">Super Admin</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ── MAIN ── -->
+      <div class="main-wrap">
+        <!-- TOPBAR -->
+        <header class="topbar">
+          <div class="topbar-info">
+            <div class="topbar-title">Dashboard</div>
+            <div class="topbar-breadcrumb">Tổng quan hệ thống</div>
+          </div>
+          <div class="topbar-right">
+            <div class="dropdown">
+              <button
+                class="icon-btn"
+                id="settingsBtn"
+                title="Cài đặt"
+                onclick="toggleLogoutDropdown()"
+              >
+                ⚙️
+              </button>
+              <div class="dropdown-menu" id="logoutDropdown">
+                <button
+                  class="dropdown-item dropdown-item-logout"
+                  onclick="logout()"
+                >
+                  ❌ Đăng xuất
+                </button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- PAGE CONTENT -->
+        <div class="page-wrap">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Tổng quan</div>
+              <div class="page-subtitle" id="dashDate">—</div>
+            </div>
+            <button class="btn btn-outline" onclick="loadDashboard()">
+              🔄 Làm mới
+            </button>
+          </div>
+
+          <!-- STAT CARDS -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon blue">💰</div>
+              <div>
+                <div class="stat-val" id="statRevenue">—</div>
+                <div class="stat-label">Doanh thu (đơn hoàn thành)</div>
+                <div class="stat-change up" id="statRevenueChange">
+                  ↑ loading...
+                </div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon cyan">📦</div>
+              <div>
+                <div class="stat-val" id="statOrders">—</div>
+                <div class="stat-label">Tổng đơn hàng</div>
+                <div class="stat-change up" id="statPending">
+                  — đơn chờ xử lý
+                </div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon green">🛍</div>
+              <div>
+                <div class="stat-val" id="statProducts">—</div>
+                <div class="stat-label">Sản phẩm còn hàng</div>
+                <div class="stat-change down" id="statLowStock">
+                  — sắp hết hàng
+                </div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon orange">👥</div>
+              <div>
+                <div class="stat-val" id="statUsers">—</div>
+                <div class="stat-label">Người dùng</div>
+                <div class="stat-change up" id="statDiscounts">
+                  — mã giảm giá active
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CHART + TOP PRODUCTS -->
+          <div class="grid-2" style="margin-bottom: 20px">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">📈 Doanh thu 7 ngày gần nhất</div>
+                  <div class="card-subtitle">Đơn vị: VNĐ</div>
+                </div>
+              </div>
+              <div style="padding: 20px">
+                <div class="chart-placeholder" id="revenueChart">
+                  <div class="chart-bar"></div>
+                  <div class="chart-bar"></div>
+                  <div class="chart-bar"></div>
+                  <div class="chart-bar"></div>
+                  <div class="chart-bar"></div>
+                  <div class="chart-bar"></div>
+                  <div class="chart-bar"></div>
+                </div>
+                <div class="chart-labels">
+                  <span>T2</span><span>T3</span><span>T4</span><span>T5</span
+                  ><span>T6</span><span>T7</span><span>CN</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">🏆 Top sản phẩm đánh giá cao</div>
+              </div>
+              <div style="padding: 6px 20px 16px" id="topProductsList"></div>
+            </div>
+          </div>
+
+          <!-- RECENT ORDERS -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📋 Đơn hàng gần đây</div>
+              <a th:href="@{/admin/order/list}" class="btn btn-sm btn-outline"
+                >Xem tất cả →</a
+              >
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Order Code</th>
+                    <th>Khách hàng</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày tạo</th>
+                  </tr>
+                </thead>
+                <tbody id="recentOrdersBody">
+                  <tr>
+                    <td
+                      colspan="5"
+                      style="
+                        text-align: center;
+                        padding: 40px;
+                        color: var(--text-muted);
+                      "
+                    >
+                      Đang tải...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- /page-wrap -->
+      </div>
+      <!-- /main-wrap -->
+    </div>
+    <!-- /admin-layout -->
+
+    <script th:src="@{/admin/js/admin.js}"></script>
+    <script>
+      async function loadDashboard() {
+        document.getElementById("dashDate").textContent =
+          new Date().toLocaleDateString("vi-VN", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
+
+        const s = await API.getDashboardStats();
+
+        document.getElementById("statRevenue").textContent =
+          Utils.formatCurrency(s.totalRevenue);
+        document.getElementById("statOrders").textContent = s.totalOrders;
+        document.getElementById("statProducts").textContent = s.activeProducts;
+        document.getElementById("statUsers").textContent = s.totalUsers;
+        document.getElementById("statPending").textContent =
+          `⏳ ${s.pendingOrders} đơn chờ xử lý`;
+        document.getElementById("statLowStock").textContent =
+          `⚠ ${s.lowStock} sắp hết hàng`;
+        document.getElementById("statDiscounts").textContent =
+          `🏷 ${s.activeDiscounts} mã đang active`;
+        document.getElementById("navBadge").textContent = s.pendingOrders;
+
+        // Recent orders table
+        document.getElementById("recentOrdersBody").innerHTML = s.recentOrders
+          .map(
+            (o) => `
+    <tr>
+      <td class="td-mono"><strong>${o.orderCode || o.order_code}</strong></td>
+      <td>${o.userName || o.username || "—"}</td>
+      <td style="font-weight:700;color:var(--primary)">${Utils.formatCurrency(o.totalAmount ?? o.total)}</td>
+      <td>${Utils.statusBadge(o.status)}</td>
+      <td class="td-mono">${o.createdAt || o.placedAt || o.created_at}</td>
+    </tr>
+  `,
+          )
+          .join("");
+
+        // Top products
+        document.getElementById("topProductsList").innerHTML = s.topProducts
+          .map(
+            (p) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-size:13px;font-weight:600">${p.name}</div>
+        <div style="margin-top:3px">${Utils.stars(p.rating_avg)} <small style="color:var(--text-muted)">(${p.rating_count} đánh giá)</small></div>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:var(--primary)">${Utils.formatCurrency(p.price)}</div>
+    </div>
+  `,
+          )
+          .join("");
+      }
+
+      document.addEventListener("DOMContentLoaded", loadDashboard);
+    </script>
+  </body>
+</html>

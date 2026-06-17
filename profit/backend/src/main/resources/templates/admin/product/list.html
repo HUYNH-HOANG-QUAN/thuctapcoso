@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Products — VitaStore Admin</title>
+    <link rel="stylesheet" th:href="@{/admin/css/style.css?v=1}" />
+  </head>
+  <body>
+    <div class="admin-layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <div class="logo-icon">🌿</div>
+          <div>
+            <div class="logo-text">VitaStore</div>
+            <div class="logo-sub">Admin Panel</div>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section-label">Tổng quan</div>
+          <a class="nav-item" th:href="@{/admin}"
+            ><span class="nav-icon">🏠</span> Dashboard</a
+          >
+          <div class="nav-section-label">Quản lý đơn hàng</div>
+          <a class="nav-item" th:href="@{/admin/order/list}"
+            ><span class="nav-icon">📦</span> Orders</a
+          >
+          <div class="nav-section-label">Sản phẩm</div>
+          <a class="nav-item active" th:href="@{/admin/product/list}"
+            ><span class="nav-icon">🛍</span> Products</a
+          >
+          <a class="nav-item" th:href="@{/admin/product/category}"
+            ><span class="nav-icon">🗂</span> Categories</a
+          >
+          <div class="nav-section-label">Người dùng</div>
+          <a class="nav-item" th:href="@{/admin/user/list}"
+            ><span class="nav-icon">👥</span> Users</a
+          >
+          <div class="nav-section-label">Marketing</div>
+          <a class="nav-item" th:href="@{/admin/marketing/discount}"
+            ><span class="nav-icon">🏷</span> Discounts</a
+          >
+          <div class="nav-section-label">Reviews</div>
+          <a class="nav-item" th:href="@{/admin/reviews/review}"
+            ><span class="nav-icon">⭐</span> Reviews</a
+          >
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="admin-profile">
+            <div class="admin-avatar">A</div>
+            <div>
+              <div class="admin-name">Admin Master</div>
+              <div class="admin-role">Super Admin</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="main-wrap">
+        <header class="topbar">
+          <div class="topbar-info">
+            <div class="topbar-title">Products</div>
+            <div class="topbar-breadcrumb">Quản lý sản phẩm</div>
+          </div>
+          <div class="topbar-right">
+            <button
+              class="icon-btn"
+              title="Cài đặt"
+              onclick="toggleLogoutDropdown()"
+            >
+              ⚙️
+            </button>
+            <div
+              class="dropdown-menu"
+              id="logoutDropdown"
+              style="display: none"
+            >
+              <button
+                class="dropdown-item dropdown-item-logout"
+                onclick="logout()"
+              >
+                ❌ Đăng xuất
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <div class="page-wrap">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Danh sách Products</div>
+              <div class="page-subtitle">Quản lý thực phẩm chức năng</div>
+            </div>
+            <a th:href="@{/admin/product/add}" class="btn btn-primary"
+              >+ Add Product</a
+            >
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="toolbar">
+                <div class="search-box">
+                  <span class="search-icon">🔍</span>
+                  <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Tìm tên sản phẩm..."
+                    oninput="filterProducts()"
+                  />
+                </div>
+                <select
+                  class="select-filter"
+                  id="catFilter"
+                  onchange="filterProducts()"
+                >
+                  <option value="">Tất cả danh mục</option>
+                </select>
+                <select
+                  class="select-filter"
+                  id="stockFilter"
+                  onchange="filterProducts()"
+                >
+                  <option value="">Tất cả tồn kho</option>
+                  <option value="low">Sắp hết (&lt;50)</option>
+                  <option value="ok">Còn hàng</option>
+                </select>
+              </div>
+              <span class="badge badge-info" id="productCount">—</span>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Category ID</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Rating Avg</th>
+                    <th>Rating Count</th>
+                    <th>Stock</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="productsBody">
+                  <tr>
+                    <td
+                      colspan="8"
+                      style="
+                        text-align: center;
+                        padding: 40px;
+                        color: var(--text-muted);
+                      "
+                    >
+                      Đang tải...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="pagination">
+              <button class="page-btn">‹</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">›</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DELETE CONFIRM -->
+    <div class="modal-overlay" id="deleteModalOverlay">
+      <div class="modal modal-sm">
+        <div
+          class="modal-body"
+          style="padding: 32px 28px 20px; text-align: center"
+        >
+          <div class="confirm-icon">🗑️</div>
+          <div class="confirm-title">Xác nhận xóa sản phẩm</div>
+          <div class="confirm-text">
+            Bạn đang xóa sản phẩm<br /><strong id="deleteTargetLabel"></strong
+            ><br />Hành động này không thể hoàn tác!
+          </div>
+          <div class="countdown-bar">
+            <div class="countdown-fill" id="countdownFill"></div>
+          </div>
+          <div class="countdown-label" id="countdownLabel">
+            Vui lòng chờ 10 giây...
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="DeleteConfirm.hide()">
+            Hủy
+          </button>
+          <button
+            class="btn btn-danger"
+            id="confirmDeleteBtn"
+            onclick="DeleteConfirm.confirm()"
+            disabled
+          >
+            Xác nhận xóa
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script th:src="@{/admin/js/admin.js}"></script>
+    <script>
+      let allProducts = [];
+
+      async function loadProducts() {
+        const [products, cats] = await Promise.all([
+          API.getProducts(),
+          API.getCategories(),
+        ]);
+        allProducts = products;
+
+        // populate category filter
+        const catSel = document.getElementById("catFilter");
+        cats.forEach((c) => {
+          const opt = document.createElement("option");
+          opt.value = c.id;
+          opt.textContent = c.name;
+          catSel.appendChild(opt);
+        });
+
+        renderProducts(allProducts);
+      }
+
+      function renderProducts(list) {
+        document.getElementById("productCount").textContent =
+          `${list.length} sản phẩm`;
+        document.getElementById("productsBody").innerHTML = list.length
+          ? list
+              .map(
+                (p) => `
+        <tr>
+          <td class="td-mono">${p.id}</td>
+          <td class="td-mono">${p.category_id}</td>
+          <td><strong>${p.name}</strong></td>
+          <td style="font-weight:700;color:var(--primary)">${Utils.formatCurrency(p.price)}</td>
+          <td>${Utils.stars(p.rating_avg)}</td>
+          <td class="td-mono">${p.rating_count}</td>
+          <td>
+            ${
+              p.stock_quantity < 50
+                ? `<span class="badge badge-warning">⚠ ${p.stock_quantity}</span>`
+                : `<span class="badge badge-success">${p.stock_quantity}</span>`
+            }
+          </td>
+          <td>
+            <div class="action-group">
+              <a href="add.html?edit=${p.id}" class="btn btn-sm btn-outline">✏️ Edit</a>
+              <button class="btn btn-sm btn-danger" onclick="confirmDelete(${p.id},'${p.name}')">🗑 Delete</button>
+            </div>
+          </td>
+        </tr>`,
+              )
+              .join("")
+          : `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted)">Không tìm thấy sản phẩm</td></tr>`;
+      }
+
+      function filterProducts() {
+        const q = document.getElementById("searchInput").value.toLowerCase();
+        const cat = document.getElementById("catFilter").value;
+        const stk = document.getElementById("stockFilter").value;
+        renderProducts(
+          allProducts.filter(
+            (p) =>
+              (!q || p.name.toLowerCase().includes(q)) &&
+              (!cat || p.category_id == cat) &&
+              (!stk ||
+                (stk === "low"
+                  ? p.stock_quantity < 50
+                  : p.stock_quantity >= 50)),
+          ),
+        );
+      }
+
+      function confirmDelete(id, name) {
+        DeleteConfirm.show(`"${name}"`, async () => {
+          await API.deleteProduct(id);
+          allProducts = allProducts.filter((p) => p.id !== id);
+          renderProducts(allProducts);
+          Utils.toast(`Đã xóa sản phẩm "${name}"`);
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", loadProducts);
+    </script>
+  </body>
+</html>

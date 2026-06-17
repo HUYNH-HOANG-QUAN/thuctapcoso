@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Discounts — VitaStore Admin</title>
+    <link rel="stylesheet" th:href="@{/admin/css/style.css?v=1}" />
+  </head>
+  <body>
+    <div class="admin-layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <div class="logo-icon">🌿</div>
+          <div>
+            <div class="logo-text">VitaStore</div>
+            <div class="logo-sub">Admin Panel</div>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section-label">Tổng quan</div>
+          <a class="nav-item" th:href="@{/admin}"
+            ><span class="nav-icon">🏠</span> Dashboard</a
+          >
+          <div class="nav-section-label">Quản lý đơn hàng</div>
+          <a class="nav-item" th:href="@{/admin/order/list}"
+            ><span class="nav-icon">📦</span> Orders</a
+          >
+          <div class="nav-section-label">Sản phẩm</div>
+          <a class="nav-item" th:href="@{/admin/product/list}"
+            ><span class="nav-icon">🛍</span> Products</a
+          >
+          <a class="nav-item" th:href="@{/admin/product/category}"
+            ><span class="nav-icon">🗂</span> Categories</a
+          >
+          <div class="nav-section-label">Người dùng</div>
+          <a class="nav-item" th:href="@{/admin/user/list}"
+            ><span class="nav-icon">👥</span> Users</a
+          >
+          <div class="nav-section-label">Marketing</div>
+          <a class="nav-item active" th:href="@{/admin/marketing/discount}"
+            ><span class="nav-icon">🏷</span> Discounts</a
+          >
+          <div class="nav-section-label">Reviews</div>
+          <a class="nav-item" th:href="@{/admin/reviews/review}"
+            ><span class="nav-icon">⭐</span> Reviews</a
+          >
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="admin-profile">
+            <div class="admin-avatar">A</div>
+            <div>
+              <div class="admin-name">Admin Master</div>
+              <div class="admin-role">Super Admin</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="main-wrap">
+        <header class="topbar">
+          <div class="topbar-info">
+            <div class="topbar-title">Marketing</div>
+            <div class="topbar-breadcrumb">Discounts</div>
+          </div>
+          <div class="topbar-right">
+            <button
+              class="icon-btn"
+              title="Cài đặt"
+              onclick="toggleLogoutDropdown()"
+            >
+              ⚙️
+            </button>
+            <div
+              class="dropdown-menu"
+              id="logoutDropdown"
+              style="display: none"
+            >
+              <button
+                class="dropdown-item dropdown-item-logout"
+                onclick="logout()"
+              >
+                ❌ Đăng xuất
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <div class="page-wrap">
+          <!-- ──────────── DISCOUNTS SECTION ──────────── -->
+          <div class="page-header">
+            <div>
+              <div class="page-title">Mã giảm giá</div>
+              <div class="page-subtitle">Quản lý tất cả discount code</div>
+            </div>
+            <button class="btn btn-primary" onclick="openAddDiscount()">
+              + Thêm mã giảm giá
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="toolbar">
+                <div class="search-box">
+                  <span class="search-icon">🔍</span>
+                  <input
+                    type="text"
+                    id="discSearch"
+                    placeholder="Tìm mã code..."
+                    oninput="filterDisc()"
+                  />
+                </div>
+                <select
+                  class="select-filter"
+                  id="discValidFilter"
+                  onchange="filterDisc()"
+                >
+                  <option value="">Tất cả trạng thái</option>
+                  <option value="valid">Valid</option>
+                  <option value="invalid">Invalid</option>
+                </select>
+              </div>
+              <span class="badge badge-info" id="discCount">—</span>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Code</th>
+                    <th>Discount (%)</th>
+                    <th>Is Valid</th>
+                    <th>Times Used</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="discBody">
+                  <tr>
+                    <td
+                      colspan="6"
+                      style="
+                        text-align: center;
+                        padding: 40px;
+                        color: var(--text-muted);
+                      "
+                    >
+                      Đang tải...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DISCOUNT MODAL ── -->
+    <div class="modal-overlay" id="discModalOverlay">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title" id="discModalTitle">Thêm mã giảm giá</div>
+          <button
+            class="btn btn-ghost btn-icon"
+            onclick="Modal.close('discModalOverlay')"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="dId" />
+          <div class="form-group">
+            <label class="form-label">Mã code *</label>
+            <input
+              class="form-control"
+              id="dCode"
+              required
+              placeholder="VD: SALE20"
+              style="
+                font-family: &quot;DM Mono&quot;, monospace;
+                font-size: 16px;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+              "
+            />
+            <div class="form-hint">Tự động chuyển chữ hoa</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phần trăm giảm (%) *</label>
+            <input
+              class="form-control"
+              id="dPct"
+              type="number"
+              min="1"
+              max="100"
+              required
+              placeholder="20"
+            />
+          </div>
+          <div
+            class="form-group"
+            style="display: flex; align-items: center; gap: 16px"
+          >
+            <label class="form-label" style="margin: 0; cursor: pointer"
+              >Kích hoạt (Is Valid)</label
+            >
+            <label class="toggle">
+              <input type="checkbox" id="dValid" checked />
+              <span class="toggle-slider"></span>
+            </label>
+            <span
+              id="dValidLabel"
+              style="font-size: 12px; color: var(--text-muted)"
+              >Đang bật</span
+            >
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            class="btn btn-outline"
+            onclick="Modal.close('discModalOverlay')"
+          >
+            Hủy
+          </button>
+          <button
+            class="btn btn-primary"
+            id="dSaveBtn"
+            onclick="saveDiscount()"
+          >
+            💾 Lưu
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DELETE CONFIRM -->
+    <div class="modal-overlay" id="deleteModalOverlay">
+      <div class="modal modal-sm">
+        <div
+          class="modal-body"
+          style="padding: 32px 28px 20px; text-align: center"
+        >
+          <div class="confirm-icon">🗑️</div>
+          <div class="confirm-title">Xác nhận xóa</div>
+          <div class="confirm-text">
+            <strong id="deleteTargetLabel"></strong>
+          </div>
+          <div class="countdown-bar">
+            <div class="countdown-fill" id="countdownFill"></div>
+          </div>
+          <div class="countdown-label" id="countdownLabel">
+            Vui lòng chờ 10 giây...
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="DeleteConfirm.hide()">
+            Hủy
+          </button>
+          <button
+            class="btn btn-danger"
+            id="confirmDeleteBtn"
+            onclick="DeleteConfirm.confirm()"
+            disabled
+          >
+            Xác nhận xóa
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script th:src="@{/admin/js/admin.js}"></script>
+    <script>
+      let allDisc = [];
+      let editDiscId = null;
+
+      // ─── INIT ───────────────────────────────────────────────────
+      async function init() {
+        allDisc = await API.getDiscounts();
+        renderDisc(allDisc);
+
+        // Toggle label
+        document
+          .getElementById("dValid")
+          .addEventListener("change", function () {
+            document.getElementById("dValidLabel").textContent = this.checked
+              ? "Đang bật"
+              : "Đã tắt";
+          });
+
+        // Auto uppercase code
+        document.getElementById("dCode").addEventListener("input", function () {
+          const pos = this.selectionStart;
+          this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+          this.setSelectionRange(pos, pos);
+        });
+      }
+
+      // ─── DISCOUNT ───────────────────────────────────────────────
+      function renderDisc(list) {
+        document.getElementById("discCount").textContent = `${list.length} mã`;
+        document.getElementById("discBody").innerHTML = list.length
+          ? list
+              .map(
+                (d) => `
+        <tr>
+          <td class="td-mono">${d.id}</td>
+          <td>
+            <span style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;
+                         background:var(--primary-light);color:var(--primary-dark);
+                         padding:4px 10px;border-radius:6px;letter-spacing:1px">${d.code}</span>
+          </td>
+          <td>
+            <span class="badge badge-cyan" style="font-size:13px;font-family:'DM Mono',monospace">
+              ${d.discount}% OFF
+            </span>
+          </td>
+          <td>${Utils.validBadge(d.is_valid)}</td>
+          <td class="td-mono">${d.times_used} lần</td>
+          <td>
+            <div class="action-group">
+              <button class="btn btn-sm btn-outline" onclick='openEditDisc(${JSON.stringify(d)})'>✏️ Edit</button>
+              <button class="btn btn-sm btn-danger" onclick="delDisc(${d.id},'${d.code}')">🗑 Delete</button>
+            </div>
+          </td>
+        </tr>`,
+              )
+              .join("")
+          : `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted)">Không có mã giảm giá</td></tr>`;
+      }
+
+      function filterDisc() {
+        const q = document.getElementById("discSearch").value.toLowerCase();
+        const vf = document.getElementById("discValidFilter").value;
+        renderDisc(
+          allDisc.filter(
+            (d) =>
+              (!q || d.code.toLowerCase().includes(q)) &&
+              (!vf || (vf === "valid" ? d.is_valid : !d.is_valid)),
+          ),
+        );
+      }
+
+      function openAddDiscount() {
+        editDiscId = null;
+        document.getElementById("discModalTitle").textContent =
+          "Thêm mã giảm giá mới";
+        ["dId", "dCode", "dPct"].forEach(
+          (id) => (document.getElementById(id).value = ""),
+        );
+        document.getElementById("dValid").checked = true;
+        document.getElementById("dValidLabel").textContent = "Đang bật";
+        Modal.open("discModalOverlay");
+      }
+
+      function openEditDisc(d) {
+        editDiscId = d.id;
+        document.getElementById("discModalTitle").textContent =
+          `Chỉnh sửa mã: ${d.code}`;
+        document.getElementById("dId").value = d.id;
+        document.getElementById("dCode").value = d.code;
+        document.getElementById("dPct").value = d.discount;
+        document.getElementById("dValid").checked = d.is_valid;
+        document.getElementById("dValidLabel").textContent = d.is_valid
+          ? "Đang bật"
+          : "Đã tắt";
+        Modal.open("discModalOverlay");
+      }
+
+      async function saveDiscount() {
+        const code = document.getElementById("dCode").value.trim();
+        const pct = +document.getElementById("dPct").value;
+        if (!code || !pct) {
+          Utils.toast("Vui lòng điền đầy đủ!", "error");
+          return;
+        }
+
+        const btn = document.getElementById("dSaveBtn");
+        btn.disabled = true;
+        btn.textContent = "⏳...";
+
+        const data = {
+          code,
+          discount: pct,
+          is_valid: document.getElementById("dValid").checked,
+        };
+
+        if (editDiscId) {
+          await API.updateDiscount(editDiscId, data);
+          const idx = allDisc.findIndex((d) => d.id === editDiscId);
+          if (idx >= 0) allDisc[idx] = { ...allDisc[idx], ...data };
+          Utils.toast(`Đã cập nhật mã "${code}"`);
+        } else {
+          const created = await API.createDiscount(data);
+          allDisc.push({ ...created, times_used: 0 });
+          Utils.toast(`Đã thêm mã "${code}"`);
+        }
+
+        Modal.close("discModalOverlay");
+        renderDisc(allDisc);
+        btn.disabled = false;
+        btn.innerHTML = "💾 Lưu";
+      }
+
+      function delDisc(id, code) {
+        DeleteConfirm.show(`Xóa mã giảm giá "${code}"`, async () => {
+          await API.deleteDiscount(id);
+          allDisc = allDisc.filter((d) => d.id !== id);
+          renderDisc(allDisc);
+          Utils.toast(`Đã xóa mã "${code}"`);
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", init);
+    </script>
+  </body>
+</html>

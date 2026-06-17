@@ -1,0 +1,37 @@
+# ========================================
+# FILE CẤU HÌNH MẪU - KHÔNG CHỨA THÔNG TIN THẬT
+# Copy file này thành application-local.yaml và điền thông tin của bạn
+# ========================================
+
+spring:
+  datasource:
+    # Thông tin MySQL của bạn
+    username: YOUR_MYSQL_USERNAME
+    password: "YOUR_MYSQL_PASSWORD"
+    url: "jdbc:mysql://localhost:3306/ProFitSuppsDB?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Ho_Chi_Minh&connectionCharacterSet=UTF-8"
+
+  # Bật dotenv support (Spring Boot 3.x+)
+  dotenv:
+    enabled: true
+
+app:
+  jwt:
+    # JWT secret cho local dev - THAY BẰNG GIÁ TRỊ THẬT TRONG .env KHI DEPLOY
+    secret: "ProFitJwtSecretKeyMustBeAtLeastSixtyFourCharactersLongForHS512Algorithm2024"
+    expiration-ms: 86400000
+    remember-expiration-ms: 604800000
+  bootstrap:
+    admin:
+      enabled: false
+    customer:
+      enabled: false
+  vnpay:
+    tmn-code: "SY273SZH"
+    hash-secret: "SFP53JL1Z5AS4O5WFIEBMEARJAEMDTBT"
+    url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+    return-url: "http://localhost:5173/vnpay-return"
+    ipn-url: "http://localhost:8080/ProFitSuppsDB/api/v1/vnpay/ipn"
+    mode: "sandbox"
+  # URL gốc của frontend — dùng cho redirect sau khi thanh toán
+  frontend:
+    base-url: "http://localhost:5173"

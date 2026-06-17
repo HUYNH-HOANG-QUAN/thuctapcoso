@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Categories — VitaStore Admin</title>
+    <link rel="stylesheet" th:href="@{/admin/css/style.css?v=1}" />
+  </head>
+  <body>
+    <div class="admin-layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <div class="logo-icon">🌿</div>
+          <div>
+            <div class="logo-text">VitaStore</div>
+            <div class="logo-sub">Admin Panel</div>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section-label">Tổng quan</div>
+          <a class="nav-item" th:href="@{/admin}"
+            ><span class="nav-icon">🏠</span> Dashboard</a
+          >
+          <div class="nav-section-label">Quản lý đơn hàng</div>
+          <a class="nav-item" th:href="@{/admin/order/list}"
+            ><span class="nav-icon">📦</span> Orders</a
+          >
+          <div class="nav-section-label">Sản phẩm</div>
+          <a class="nav-item" th:href="@{/admin/product/list}"
+            ><span class="nav-icon">🛍</span> Products</a
+          >
+          <a class="nav-item active" th:href="@{/admin/product/category}"
+            ><span class="nav-icon">🗂</span> Categories</a
+          >
+          <div class="nav-section-label">Người dùng</div>
+          <a class="nav-item" th:href="@{/admin/user/list}"
+            ><span class="nav-icon">👥</span> Users</a
+          >
+          <div class="nav-section-label">Marketing</div>
+          <a class="nav-item" th:href="@{/admin/marketing/discount}"
+            ><span class="nav-icon">🏷</span> Discounts</a
+          >
+          <div class="nav-section-label">Reviews</div>
+          <a class="nav-item" th:href="@{/admin/reviews/review}"
+            ><span class="nav-icon">⭐</span> Reviews</a
+          >
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="admin-profile">
+            <div class="admin-avatar">A</div>
+            <div>
+              <div class="admin-name">Admin Master</div>
+              <div class="admin-role">Super Admin</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="main-wrap">
+        <header class="topbar">
+          <div class="topbar-info">
+            <div class="topbar-title">Categories</div>
+            <div class="topbar-breadcrumb">Products → Quản lý danh mục</div>
+          </div>
+          <div class="topbar-right">
+            <button
+              class="icon-btn"
+              title="Cài đặt"
+              onclick="toggleLogoutDropdown()"
+            >
+              ⚙️
+            </button>
+            <div
+              class="dropdown-menu"
+              id="logoutDropdown"
+              style="display: none"
+            >
+              <button
+                class="dropdown-item dropdown-item-logout"
+                onclick="logout()"
+              >
+                ❌ Đăng xuất
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <div class="page-wrap">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Quản lý Categories</div>
+              <div class="page-subtitle">Thêm, sửa, xóa danh mục sản phẩm</div>
+            </div>
+            <button class="btn btn-primary" onclick="openAdd()">
+              + Thêm danh mục
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="toolbar">
+                <div class="search-box">
+                  <span class="search-icon">🔍</span>
+                  <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Tìm danh mục..."
+                    oninput="filterCats()"
+                  />
+                </div>
+              </div>
+              <span class="badge badge-info" id="catCount">—</span>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Slug</th>
+                    <th>Products</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="catsBody">
+                  <tr>
+                    <td
+                      colspan="5"
+                      style="
+                        text-align: center;
+                        padding: 40px;
+                        color: var(--text-muted);
+                      "
+                    >
+                      Đang tải...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ADD / EDIT CATEGORY MODAL ── -->
+    <div class="modal-overlay" id="catModalOverlay">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title" id="catModalTitle">Thêm danh mục</div>
+          <button
+            class="btn btn-ghost btn-icon"
+            onclick="Modal.close('catModalOverlay')"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="catFormId" />
+          <div class="form-group">
+            <label class="form-label">Tên danh mục *</label>
+            <input
+              class="form-control"
+              id="catFormName"
+              required
+              placeholder="VD: Vitamins & Minerals"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Slug *</label>
+            <input
+              class="form-control"
+              id="catFormSlug"
+              required
+              placeholder="vitamins-minerals"
+            />
+            <div class="form-hint">
+              Chữ thường, ngăn cách bằng dấu gạch ngang
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            class="btn btn-outline"
+            onclick="Modal.close('catModalOverlay')"
+          >
+            Hủy
+          </button>
+          <button
+            class="btn btn-primary"
+            id="catSaveBtn"
+            onclick="saveCategory()"
+          >
+            💾 Lưu
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DELETE CONFIRM -->
+    <div class="modal-overlay" id="deleteModalOverlay">
+      <div class="modal modal-sm">
+        <div
+          class="modal-body"
+          style="padding: 32px 28px 20px; text-align: center"
+        >
+          <div class="confirm-icon">🗑️</div>
+          <div class="confirm-title">Xác nhận xóa danh mục</div>
+          <div class="confirm-text">
+            Bạn đang xóa<br /><strong id="deleteTargetLabel"></strong><br />Toàn
+            bộ sản phẩm liên quan có thể bị ảnh hưởng!
+          </div>
+          <div class="countdown-bar">
+            <div class="countdown-fill" id="countdownFill"></div>
+          </div>
+          <div class="countdown-label" id="countdownLabel">
+            Vui lòng chờ 10 giây...
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="DeleteConfirm.hide()">
+            Hủy
+          </button>
+          <button
+            class="btn btn-danger"
+            id="confirmDeleteBtn"
+            onclick="DeleteConfirm.confirm()"
+            disabled
+          >
+            Xác nhận xóa
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script th:src="@{/admin/js/admin.js}"></script>
+    <script>
+      let allCats = [];
+      let editCatId = null;
+
+      async function loadCats() {
+        allCats = await API.getCategories();
+        renderCats(allCats);
+      }
+
+      function renderCats(list) {
+        document.getElementById("catCount").textContent =
+          `${list.length} danh mục`;
+        document.getElementById("catsBody").innerHTML = list.length
+          ? list
+              .map(
+                (c) => `
+        <tr>
+          <td class="td-mono">${c.id}</td>
+          <td><strong>${c.name}</strong></td>
+          <td class="td-mono">${c.slug}</td>
+          <td><span class="badge badge-cyan">🛍 ${c.products} sản phẩm</span></td>
+          <td>
+            <div class="action-group">
+              <button class="btn btn-sm btn-outline" onclick='openEdit(${JSON.stringify(c)})'>✏️ Edit</button>
+              <button class="btn btn-sm btn-danger" onclick="confirmDelete(${c.id},'${c.name}')">🗑 Delete</button>
+            </div>
+          </td>
+        </tr>`,
+              )
+              .join("")
+          : `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">Không có danh mục</td></tr>`;
+      }
+
+      function filterCats() {
+        const q = document.getElementById("searchInput").value.toLowerCase();
+        renderCats(
+          allCats.filter(
+            (c) => c.name.toLowerCase().includes(q) || c.slug.includes(q),
+          ),
+        );
+      }
+
+      function openAdd() {
+        editCatId = null;
+        document.getElementById("catModalTitle").textContent =
+          "Thêm danh mục mới";
+        document.getElementById("catFormId").value = "";
+        document.getElementById("catFormName").value = "";
+        document.getElementById("catFormSlug").value = "";
+        Modal.open("catModalOverlay");
+      }
+
+      function openEdit(cat) {
+        editCatId = cat.id;
+        document.getElementById("catModalTitle").textContent =
+          "Chỉnh sửa danh mục";
+        document.getElementById("catFormId").value = cat.id;
+        document.getElementById("catFormName").value = cat.name;
+        document.getElementById("catFormSlug").value = cat.slug;
+        Modal.open("catModalOverlay");
+      }
+
+      // Auto-generate slug from name
+      document.addEventListener("DOMContentLoaded", () => {
+        document
+          .getElementById("catFormName")
+          .addEventListener("input", function () {
+            if (!editCatId) {
+              document.getElementById("catFormSlug").value = this.value
+                .toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, "")
+                .trim()
+                .replace(/\s+/g, "-");
+            }
+          });
+        loadCats();
+      });
+
+      async function saveCategory() {
+        const name = document.getElementById("catFormName").value.trim();
+        const slug = document.getElementById("catFormSlug").value.trim();
+        if (!name || !slug) {
+          Utils.toast("Vui lòng điền đầy đủ!", "error");
+          return;
+        }
+
+        const btn = document.getElementById("catSaveBtn");
+        btn.disabled = true;
+        btn.textContent = "⏳...";
+
+        const data = { name, slug };
+        if (editCatId) {
+          await API.updateCategory(editCatId, data);
+          const idx = allCats.findIndex((c) => c.id === editCatId);
+          if (idx >= 0) allCats[idx] = { ...allCats[idx], ...data };
+          Utils.toast("Đã cập nhật danh mục!");
+        } else {
+          const created = await API.createCategory(data);
+          allCats.push({ ...created, products: 0 });
+          Utils.toast("Đã thêm danh mục mới!");
+        }
+
+        Modal.close("catModalOverlay");
+        renderCats(allCats);
+        btn.disabled = false;
+        btn.innerHTML = "💾 Lưu";
+      }
+
+      function confirmDelete(id, name) {
+        DeleteConfirm.show(`danh mục "${name}"`, async () => {
+          await API.deleteCategory(id);
+          allCats = allCats.filter((c) => c.id !== id);
+          renderCats(allCats);
+          Utils.toast(`Đã xóa danh mục "${name}"`);
+        });
+      }
+    </script>
+  </body>
+</html>

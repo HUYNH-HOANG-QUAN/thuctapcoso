@@ -1,0 +1,70 @@
+<!-- ═══════════════════════════════════════════════
+     fragments/sidebar.html
+     Include this fragment in every admin page
+     Usage: load via JS fetch or server-side include
+═══════════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <!-- Logo -->
+  <div class="sidebar-logo">
+    <div class="logo-icon">🌿</div>
+    <div>
+      <div class="logo-text">VitaStore</div>
+      <div class="logo-sub">Admin Panel</div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Tổng quan</div>
+    <a class="nav-item" data-page="dashboard" th:href="@{/admin}">
+      <span class="nav-icon">🏠</span> Dashboard
+    </a>
+
+    <div class="nav-section-label">Quản lý đơn hàng</div>
+    <a class="nav-item" data-page="orders" th:href="@{/admin/order/list}">
+      <span class="nav-icon">📦</span> Orders
+      <span class="nav-badge" id="navBadgeOrders">—</span>
+    </a>
+
+    <div class="nav-section-label">Sản phẩm</div>
+    <a class="nav-item" data-page="products" th:href="@{/admin/product/list}">
+      <span class="nav-icon">🛍</span> Products
+    </a>
+    <a
+      class="nav-item"
+      data-page="categories"
+      th:href="@{/admin/product/category}"
+    >
+      <span class="nav-icon">🗂</span> Categories
+    </a>
+
+    <div class="nav-section-label">Người dùng</div>
+    <a class="nav-item" data-page="users" th:href="@{/admin/user/list}">
+      <span class="nav-icon">👥</span> Users
+    </a>
+
+    <div class="nav-section-label">Marketing</div>
+    <a
+      class="nav-item"
+      data-page="discounts"
+      th:href="@{/admin/marketing/discount}"
+    >
+      <span class="nav-icon">🏷</span> Discounts
+    </a>
+    <div class="nav-section-label">Reviews</div>
+    <a class="nav-item" data-page="reviews" th:href="@{/admin/reviews/review}">
+      <span class="nav-icon">⭐</span> Reviews
+    </a>
+  </nav>
+
+  <!-- Admin profile -->
+  <div class="sidebar-bottom">
+    <div class="admin-profile">
+      <div class="admin-avatar">A</div>
+      <div>
+        <div class="admin-name">Admin Master</div>
+        <div class="admin-role">Super Admin</div>
+      </div>
+    </div>
+  </div>
+</aside>

@@ -1,0 +1,53 @@
+<!-- ═══════════════════════════════════════════════
+     fragments/header.html
+     Top navigation bar — include in every page
+     The <title> inside topbar-title is set per-page
+     via: document.getElementById('topbarTitle').textContent = '...'
+═══════════════════════════════════════════════ -->
+<header class="topbar">
+  <!-- Mobile hamburger -->
+  <button
+    class="icon-btn"
+    id="sidebarToggle"
+    title="Menu"
+    style="display: none"
+    onclick="document.getElementById('sidebar').classList.toggle('open')"
+  >
+    ☰
+  </button>
+
+  <!-- Page title + breadcrumb -->
+  <div class="topbar-info">
+    <div class="topbar-title" id="topbarTitle">Dashboard</div>
+    <div class="topbar-breadcrumb" id="topbarBreadcrumb">VitaStore Admin</div>
+  </div>
+
+  <!-- Right actions -->
+  <div class="topbar-right">
+    <!-- Settings -->
+    <div class="dropdown">
+      <button
+        class="icon-btn"
+        id="settingsBtn"
+        title="Cài đặt"
+        onclick="toggleLogoutDropdown()"
+      >
+        ⚙️
+      </button>
+      <div class="dropdown-menu" id="logoutDropdown" style="display: none">
+        <button class="dropdown-item dropdown-item-logout" onclick="logout()">
+          ❌ Đăng xuất
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Show hamburger on mobile -->
+<style>
+  @media (max-width: 960px) {
+    #sidebarToggle {
+      display: flex !important;
+    }
+  }
+</style>

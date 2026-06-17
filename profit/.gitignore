@@ -1,0 +1,69 @@
+# ========================================
+# CẤU HÌNH IGNORE CHUNG CHO CẢ DỰ ÁN
+# ========================================
+
+# 1. Các thư mục build và thư viện (Tránh làm nặng repo)
+node_modules/
+target/
+dist/
+build/
+.mvn/wrapper/maven-wrapper.jar
+
+# 2. Các file log và cache
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm/
+.eslintcache
+.sts4-cache/
+
+# 3. Môi trường và cấu hình cá nhân (RẤT QUAN TRỌNG - Tránh lộ API Key, Password)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+application-local.yml
+application-local.yaml
+application-local.properties
+application.yaml
+
+# 4. Cấu hình của các IDE/Editor (Tránh xung đột môi trường code của mỗi người)
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.iws
+*.iml
+*.ipr
+.project
+.classpath
+.settings/
+.factorypath
+.springBeans
+.apt_generated/
+
+# 5. Hệ điều hành
+.DS_Store
+Thumbs.db
+
+# 6. Exclude large crawled/dataset folders (patterns relative to this file's parent = profit/)
+crawl/
+download/
+dataset_online/
+dataset_clean_online/
+
+# 7. Exclude report file
+*BÁO*
+*BAO*
+*.docx
+
+# 8. Exclude IDE/editor temp files
+Untitled
+
+# Lưu ý: Các thư mục frontend/ và backend/ đã có .gitignore riêng,
+# file này đảm bảo các file rác sinh ra ở thư mục gốc (root) cũng bị bỏ qua.

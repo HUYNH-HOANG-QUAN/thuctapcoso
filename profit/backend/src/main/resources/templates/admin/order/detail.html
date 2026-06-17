@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Order Detail — VitaStore Admin</title>
+    <link rel="stylesheet" th:href="@{/admin/css/style.css?v=1}" />
+  </head>
+  <body>
+    <div class="admin-layout">
+      <!-- SIDEBAR -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <div class="logo-icon">🌿</div>
+          <div>
+            <div class="logo-text">VitaStore</div>
+            <div class="logo-sub">Admin Panel</div>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section-label">Tổng quan</div>
+          <a class="nav-item" th:href="@{/admin}"
+            ><span class="nav-icon">🏠</span> Dashboard</a
+          >
+          <div class="nav-section-label">Quản lý đơn hàng</div>
+          <a class="nav-item active" th:href="@{/admin/order/list}"
+            ><span class="nav-icon">📦</span> Orders</a
+          >
+          <div class="nav-section-label">Sản phẩm</div>
+          <a class="nav-item" th:href="@{/admin/product/list}"
+            ><span class="nav-icon">🛍</span> Products</a
+          >
+          <a class="nav-item" th:href="@{/admin/product/category}"
+            ><span class="nav-icon">🗂</span> Categories</a
+          >
+          <div class="nav-section-label">Người dùng</div>
+          <a class="nav-item" th:href="@{/admin/user/list}"
+            ><span class="nav-icon">👥</span> Users</a
+          >
+          <div class="nav-section-label">Marketing</div>
+          <a class="nav-item" th:href="@{/admin/marketing/discount}"
+            ><span class="nav-icon">🏷</span> Discounts</a
+          >
+          <a class="nav-item" th:href="@{/admin/reviews/review}"
+            ><span class="nav-icon">⭐</span> Reviews</a
+          >
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="admin-profile">
+            <div class="admin-avatar">A</div>
+            <div>
+              <div class="admin-name">Admin Master</div>
+              <div class="admin-role">Super Admin</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="main-wrap">
+        <header class="topbar">
+          <div class="topbar-info">
+            <div class="topbar-title" id="topbarTitle">Order Detail</div>
+            <div class="topbar-breadcrumb">Orders → Chi tiết đơn hàng</div>
+          </div>
+          <div class="topbar-right">
+            <button
+              class="icon-btn"
+              title="Cài đặt"
+              onclick="toggleLogoutDropdown()"
+            >
+              ⚙️
+            </button>
+            <div
+              class="dropdown-menu"
+              id="logoutDropdown"
+              style="display: none"
+            >
+              <button
+                class="dropdown-item dropdown-item-logout"
+                onclick="logout()"
+              >
+                ❌ Đăng xuất
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <div class="page-wrap">
+          <a href="list.html" class="back-btn">← Quay lại danh sách Orders</a>
+
+          <div class="page-header">
+            <div>
+              <div class="page-title" id="detailTitle">—</div>
+              <div class="page-subtitle" id="detailCreated">—</div>
+            </div>
+            <div id="detailStatusBadge"></div>
+          </div>
+
+          <div class="grid-2">
+            <!-- INFO CARD -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">📋 Thông tin đơn hàng</div>
+              </div>
+              <div style="padding: 20px">
+                <div class="detail-grid" id="detailGrid">
+                  <div
+                    style="
+                      grid-column: 1/-1;
+                      text-align: center;
+                      padding: 30px;
+                      color: var(--text-muted);
+                    "
+                  >
+                    Đang tải...
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- EDIT CARD -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">✏️ Chỉnh sửa đơn hàng</div>
+              </div>
+              <div style="padding: 22px">
+                <div class="form-group">
+                  <label class="form-label">Status *</label>
+                  <select class="form-control" id="editStatus">
+                    <option value="pending">⏳ Pending — Chờ xử lý</option>
+                    <option value="shipping">🚚 Shipping — Đang giao</option>
+                    <option value="completed">✓ Completed — Hoàn thành</option>
+                    <option value="cancelled">✗ Cancelled — Đã hủy</option>
+                  </select>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Subtotal (VNĐ)</label>
+                    <input
+                      class="form-control"
+                      type="number"
+                      id="editSubtotal"
+                      min="0"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Total Amount (VNĐ)</label>
+                    <input
+                      class="form-control"
+                      type="number"
+                      id="editTotal"
+                      min="0"
+                    />
+                  </div>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Shipping Address ID</label>
+                    <input
+                      class="form-control"
+                      type="number"
+                      id="editShippingAddr"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Payment Method ID</label>
+                    <input
+                      class="form-control"
+                      type="number"
+                      id="editPayMethod"
+                    />
+                  </div>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Shipping Method ID</label>
+                    <input
+                      class="form-control"
+                      type="number"
+                      id="editShipMethod"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Discount Code ID</label>
+                    <input
+                      class="form-control"
+                      type="text"
+                      id="editDiscountId"
+                      placeholder="Để trống nếu không có"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  class="btn btn-primary btn-lg"
+                  style="width: 100%; margin-top: 6px"
+                  id="saveBtn"
+                  onclick="saveOrder()"
+                >
+                  💾 Lưu thay đổi
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- /grid-2 -->
+        </div>
+      </div>
+    </div>
+
+    <script th:src="@{/admin/js/admin.js}"></script>
+    <script>
+      let currentOrderId = null;
+
+      async function loadDetail() {
+        const params = new URLSearchParams(location.search);
+        const id = parseInt(params.get("id")) || 1;
+        currentOrderId = id;
+
+        const d = await API.getOrderById(id);
+        if (!d) return;
+
+        // Topbar / titles
+        document.getElementById("topbarTitle").textContent = d.order_code;
+        document.getElementById("detailTitle").textContent =
+          `Đơn hàng: ${d.order_code}`;
+        document.getElementById("detailCreated").textContent =
+          `Ngày tạo: ${d.created_at}`;
+        document.getElementById("detailStatusBadge").innerHTML =
+          Utils.statusBadge(d.status);
+
+        // Info grid
+        const fields = [
+          ["ID", String(d.id)],
+          ["Order Code", d.order_code],
+          ["User ID", String(d.user_id)],
+          ["Shipping Addr. ID", String(d.shipping_address_id)],
+          ["Payment Method ID", String(d.payment_method_id)],
+          ["Shipping Method ID", String(d.shipping_method_id)],
+          [
+            "Discount Code ID",
+            d.discount_code_id ? String(d.discount_code_id) : "— (không có)",
+          ],
+          ["Subtotal", Utils.formatCurrency(d.subtotal)],
+          ["Total Amount", Utils.formatCurrency(d.total_amount)],
+          ["Status", d.status],
+          ["Created At", d.created_at],
+        ];
+
+        document.getElementById("detailGrid").innerHTML = fields
+          .map(
+            ([l, v]) => `
+    <div class="detail-field">
+      <div class="detail-field-label">${l}</div>
+      <div class="detail-field-value">${v}</div>
+    </div>
+  `,
+          )
+          .join("");
+
+        // Pre-fill edit form
+        document.getElementById("editStatus").value = d.status;
+        document.getElementById("editSubtotal").value = d.subtotal;
+        document.getElementById("editTotal").value = d.total_amount;
+        document.getElementById("editShippingAddr").value =
+          d.shipping_address_id;
+        document.getElementById("editPayMethod").value = d.payment_method_id;
+        document.getElementById("editShipMethod").value = d.shipping_method_id;
+        document.getElementById("editDiscountId").value =
+          d.discount_code_id ?? "";
+      }
+
+      async function saveOrder() {
+        const btn = document.getElementById("saveBtn");
+        btn.disabled = true;
+        btn.textContent = "⏳ Đang lưu...";
+        const data = {
+          status: document.getElementById("editStatus").value,
+          subtotal: +document.getElementById("editSubtotal").value,
+          total_amount: +document.getElementById("editTotal").value,
+          shipping_address_id:
+            +document.getElementById("editShippingAddr").value,
+          payment_method_id: +document.getElementById("editPayMethod").value,
+          shipping_method_id: +document.getElementById("editShipMethod").value,
+          discount_code_id:
+            document.getElementById("editDiscountId").value || null,
+        };
+        await API.updateOrder(currentOrderId, data);
+        Utils.toast("Đã cập nhật đơn hàng thành công!");
+        btn.disabled = false;
+        btn.innerHTML = "💾 Lưu thay đổi";
+      }
+
+      document.addEventListener("DOMContentLoaded", loadDetail);
+    </script>
+  </body>
+</html>

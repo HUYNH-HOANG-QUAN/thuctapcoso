@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Reviews — VitaStore Admin</title>
+    <link rel="stylesheet" th:href="@{/admin/css/style.css?v=1}" />
+  </head>
+  <body>
+    <div class="admin-layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <div class="logo-icon">🌿</div>
+          <div>
+            <div class="logo-text">VitaStore</div>
+            <div class="logo-sub">Admin Panel</div>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section-label">Tổng quan</div>
+          <a class="nav-item" data-page="dashboard" th:href="@{/admin}"
+            ><span class="nav-icon">🏠</span> Dashboard</a
+          >
+          <div class="nav-section-label">Quản lý đơn hàng</div>
+          <a class="nav-item" data-page="orders" th:href="@{/admin/order/list}"
+            ><span class="nav-icon">📦</span> Orders</a
+          >
+          <div class="nav-section-label">Sản phẩm</div>
+          <a
+            class="nav-item"
+            data-page="products"
+            th:href="@{/admin/product/list}"
+            ><span class="nav-icon">🛍</span> Products</a
+          >
+          <a
+            class="nav-item"
+            data-page="categories"
+            th:href="@{/admin/product/category}"
+            ><span class="nav-icon">🗂</span> Categories</a
+          >
+          <div class="nav-section-label">Người dùng</div>
+          <a class="nav-item" data-page="users" th:href="@{/admin/user/list}"
+            ><span class="nav-icon">👥</span> Users</a
+          >
+          <div class="nav-section-label">Marketing</div>
+          <a
+            class="nav-item"
+            data-page="discounts"
+            th:href="@{/admin/marketing/discount}"
+            ><span class="nav-icon">🏷</span> Discounts</a
+          >
+          <div class="nav-section-label">Reviews</div>
+          <a
+            class="nav-item active"
+            data-page="reviews"
+            th:href="@{/admin/reviews/review}"
+            ><span class="nav-icon">⭐</span> Reviews</a
+          >
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="admin-profile">
+            <div class="admin-avatar">A</div>
+            <div>
+              <div class="admin-name">Admin Master</div>
+              <div class="admin-role">Super Admin</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="main-wrap">
+        <header class="topbar">
+          <div class="topbar-info">
+            <div class="topbar-title">Reviews</div>
+            <div class="topbar-breadcrumb">Marketing / Reviews</div>
+          </div>
+          <div class="topbar-right">
+            <button
+              class="icon-btn"
+              title="Cài đặt"
+              onclick="toggleLogoutDropdown()"
+            >
+              ⚙️
+            </button>
+            <div
+              class="dropdown-menu"
+              id="logoutDropdown"
+              style="display: none"
+            >
+              <button
+                class="dropdown-item dropdown-item-logout"
+                onclick="logout()"
+              >
+                ❌ Đăng xuất
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <div class="page-wrap">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Quản lý đánh giá</div>
+              <div class="page-subtitle">Xem, lọc và xóa review người dùng</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="toolbar">
+                <div class="search-box">
+                  <span class="search-icon">🔍</span>
+                  <input
+                    type="text"
+                    id="reviewSearch"
+                    placeholder="Tìm người dùng, sản phẩm..."
+                    oninput="filterReviews()"
+                  />
+                </div>
+                <select
+                  class="select-filter"
+                  id="ratingFilter"
+                  onchange="filterReviews()"
+                >
+                  <option value="">Tất cả rating</option>
+                  <option value="5">★★★★★ (5)</option>
+                  <option value="4">★★★★ (4)</option>
+                  <option value="3">★★★ (3)</option>
+                  <option value="2">★★ (2)</option>
+                  <option value="1">★ (1)</option>
+                </select>
+              </div>
+              <span class="badge badge-info" id="reviewCount">—</span>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Product</th>
+                    <th>Rating</th>
+                    <th>Comment</th>
+                    <th>Hành động</th>
+                  </tr>
+                </thead>
+                <tbody id="reviewsBody">
+                  <tr>
+                    <td
+                      colspan="6"
+                      style="
+                        text-align: center;
+                        padding: 40px;
+                        color: var(--text-muted);
+                      "
+                    >
+                      Đang tải...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script th:src="@{/admin/js/admin.js}"></script>
+    <script>
+      let allReviews = [];
+
+      async function loadReviews() {
+        allReviews = await API.getReviews();
+        renderReviews(allReviews);
+      }
+
+      function renderReviews(list) {
+        document.getElementById("reviewCount").textContent =
+          `${list.length} đánh giá`;
+        document.getElementById("reviewsBody").innerHTML = list.length
+          ? list
+              .map(
+                (r) => `
+        <tr>
+          <td class="td-mono">${r.id}</td>
+          <td>${r.user}</td>
+          <td>${r.product}</td>
+          <td>${Utils.stars(r.rating)}</td>
+          <td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.comment}</td>
+          <td><button class="btn btn-sm btn-danger" onclick="deleteReview(${r.id})">🗑 Xóa</button></td>
+        </tr>
+      `,
+              )
+              .join("")
+          : `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted)">Không có đánh giá</td></tr>`;
+      }
+
+      function filterReviews() {
+        const q = document.getElementById("reviewSearch").value.toLowerCase();
+        const rt = document.getElementById("ratingFilter").value;
+        const filtered = allReviews.filter(
+          (r) =>
+            (!q ||
+              r.user.toLowerCase().includes(q) ||
+              r.product.toLowerCase().includes(q) ||
+              r.comment.toLowerCase().includes(q)) &&
+            (!rt || String(r.rating) === rt),
+        );
+        renderReviews(filtered);
+      }
+
+      function deleteReview(id) {
+        DeleteConfirm.show(`đánh giá #${id}`, async () => {
+          await API.deleteReview(id);
+          allReviews = allReviews.filter((r) => r.id !== id);
+          renderReviews(allReviews);
+          Utils.toast("Đã xóa đánh giá!");
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        closeLogoutDropdown();
+        loadReviews();
+      });
+    </script>
+  </body>
+</html>
