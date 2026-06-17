@@ -1,1 +1,1 @@
-# th-c-t-p-c-s-d-ph-ng-
+# dự phòng cho thục tập cơ sở
