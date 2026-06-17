@@ -598,6 +598,14 @@
   display: block;
 }
 
+.chat-product-card__img.show-emoji img {
+  display: none;
+}
+
+.chat-product-card__img:not(.show-emoji) .chat-product-card__emoji {
+  display: none;
+}
+
 .chat-product-card__emoji {
   font-size: 28px;
   line-height: 1;

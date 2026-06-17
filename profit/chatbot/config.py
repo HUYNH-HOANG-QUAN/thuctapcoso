@@ -23,3 +23,10 @@ PGVECTOR_CONNECTION = os.getenv(
 PGVECTOR_COLLECTION = os.getenv("PGCOLLECTION", "products_samples")
 # Số document tối đa lấy về cho mỗi câu query.
 RETRIEVER_K = int(os.getenv("RETRIEVER_K", "4"))
+
+# ---- Spring Boot backend (enrich product data) ----
+# Dùng để lấy thông tin đầy đủ (ảnh, rating, tags...) sau khi PGVector tìm được SKUs.
+PRODUCT_API_BASE_URL = os.getenv(
+    "PRODUCT_API_BASE_URL",
+    "http://localhost:8080/ProFitSuppsDB/api/v1/products",
+)

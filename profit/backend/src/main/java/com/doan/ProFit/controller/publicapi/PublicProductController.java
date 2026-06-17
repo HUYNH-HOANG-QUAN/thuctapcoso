@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping({ "/api/public/products", "/api/v1/products" })
 public class PublicProductController {
@@ -46,5 +48,12 @@ public class PublicProductController {
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
         return ResponseEntity.ok(productService.getProductById(id));
+    }
+
+    @GetMapping("/batch")
+    public ResponseEntity<List<ProductResponse>> getProductsBySkus(
+            @RequestParam List<String> skus
+    ) {
+        return ResponseEntity.ok(productService.getProductsBySkus(skus));
     }
 }

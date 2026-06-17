@@ -42,6 +42,19 @@ const App = () => {
   const [selectedOrder, setSelectedOrder]     = useState(null);
   const [pendingBankingOrder, setPendingBankingOrder] = useState(null); // Đơn hàng đang chờ thanh toán banking
 
+  // ── Lắng nghe điều hướng từ ChatWidget ──────────────
+  // ChatProductCard phát event `profit:navigate-product` khi user click card.
+  useEffect(() => {
+    const handler = (e) => {
+      const product = e.detail?.product;
+      if (!product) return;
+      setSelectedProduct(product);
+      setCurrentPage("detail");
+    };
+    window.addEventListener("profit:navigate-product", handler);
+    return () => window.removeEventListener("profit:navigate-product", handler);
+  }, []);
+
   // Detect URL path on mount (for direct navigation via redirect links)
   useEffect(() => {
     const path = window.location.pathname;

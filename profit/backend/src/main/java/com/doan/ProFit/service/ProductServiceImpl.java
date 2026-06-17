@@ -66,6 +66,28 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<ProductResponse> getProductsBySkus(List<String> skus) {
+        if (skus == null || skus.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+        List<Product> products = productRepository.findBySkuIn(skus);
+        if (products.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+        List<Long> ids = products.stream().map(Product::getId).collect(Collectors.toList());
+        Map<Long, String> imageMap = new HashMap<>();
+        List<Object[]> imageRows = productImageRepository.findBestImageUrlsByProductIds(ids);
+        for (Object[] row : imageRows) {
+            Long pid = ((Number) row[0]).longValue();
+            imageMap.put(pid, (String) row[1]);
+        }
+        return products.stream()
+                .map(p -> mapToResponse(p, imageMap))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Page<ProductResponse> getActiveProducts(Pageable pageable) {
         Page<Product> page = productRepository.findByIsActiveTrueAndDeletedAtIsNull(pageable);
         return page.map(this::mapToResponse);

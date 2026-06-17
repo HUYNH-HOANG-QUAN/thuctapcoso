@@ -2,13 +2,12 @@
 // components/ChatProductCard.jsx
 // Card ngang hiển thị sản phẩm trong chatbot.
 // Dùng chung helper mapProductFromApi để xử lý ảnh / format giá.
-// Click card -> đóng widget + điều hướng /product/:slug.
+// Click card -> đóng widget + điều hướng tới trang chi tiết.
 // =====================================================
 
-import { useNavigate } from 'react-router-dom';
 import { formatPrice, mapProductFromApi } from '../utils/productHelpers';
 
-// Fallback emoji theo category (dùng khi imageUrl null VÀ ảnh local cũng lỗi).
+// Fallback emoji theo category (khi imageUrl null VÀ ảnh local cũng lỗi).
 const CATEGORY_EMOJI = {
   whey: '🥛',
   creatine: '💪',
@@ -29,19 +28,38 @@ const pickEmoji = (product) => {
   return '🛒';
 };
 
-const ChatProductCard = ({ rawProduct, onCloseChat }) => {
-  const navigate = useNavigate();
-
-  // Chuẩn hoá dữ liệu từ chatbot về cùng shape với Product API.
-  // mapProductFromApi xử lý luôn: /uploads/... join API_BASE_URL,
-  // absolute URL giữ nguyên, fallback ảnh local theo category.
+/**
+ * Props:
+ *   - rawProduct : object sản phẩm thô từ chatbot
+ *   - onCloseChat: callback đóng widget (optional)
+ *   - onNavigate : callback (product) => void để điều hướng (optional).
+ *                  Nếu không truyền -> fallback window.location.pathname
+ *                  để khớp pattern routing state-based của App.jsx.
+ */
+const ChatProductCard = ({ rawProduct, onCloseChat, onNavigate }) => {
   const product = mapProductFromApi(rawProduct);
   const fallbackEmoji = pickEmoji(product);
 
   const handleClick = () => {
-    const slug = product.slug || product.sku || product.id;
     if (onCloseChat) onCloseChat();
-    if (slug) navigate(`/product/${slug}`);
+
+    if (onNavigate) {
+      onNavigate(product);
+      return;
+    }
+
+    // Fallback: App.jsx dùng state-based routing, nhưng một số slug (reset-password,
+    // banking-qr, /product/...) được nhận qua window.location.pathname trong useEffect.
+    // Tuy nhiên App hiện chưa có route "/product/:slug" -> dùng navigate state
+    // thông qua CustomEvent để App xử lý.
+    const slug = product.slug || product.sku || product.id;
+    if (slug) {
+      window.dispatchEvent(
+        new CustomEvent('profit:navigate-product', {
+          detail: { product },
+        })
+      );
+    }
   };
 
   return (
@@ -64,22 +82,21 @@ const ChatProductCard = ({ rawProduct, onCloseChat }) => {
             alt={product.name}
             loading="lazy"
             onError={(e) => {
-              // Ảnh chính lỗi -> fallback ảnh category (đã set sẵn trong imageFallback)
-              if (e.currentTarget.src !== product.imageFallback && product.imageFallback) {
+              if (
+                product.imageFallback &&
+                e.currentTarget.src !== product.imageFallback
+              ) {
                 e.currentTarget.src = product.imageFallback;
               } else {
-                // Cả fallback cũng lỗi -> ẩn img, hiện emoji
                 e.currentTarget.style.display = 'none';
-                e.currentTarget.parentElement.dataset.fallback = 'true';
+                e.currentTarget.parentElement.classList.add('show-emoji');
               }
             }}
           />
-        ) : (
-          <span className="chat-product-card__emoji" aria-hidden="true">
-            {fallbackEmoji}
-          </span>
-        )}
-        {!product.image && null}
+        ) : null}
+        <span className="chat-product-card__emoji" aria-hidden="true">
+          {fallbackEmoji}
+        </span>
       </div>
 
       <div className="chat-product-card__body">
